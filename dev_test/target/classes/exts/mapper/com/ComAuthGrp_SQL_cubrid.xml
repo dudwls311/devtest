@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.com.ComAuthGrp">
+	
+		
+	<sql id="ComAuthGrpWhere">
+		WHERE
+			1 = 1
+		<if test='delYn != null and !delYn.equals("")'>
+			AND DEL_YN = #{delYn}
+		</if>
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"1".equals(searchCondition)'>
+				AND GRP_NM LIKE '%'||#{searchKeyword}||'%'
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="ComAuthGrpColumn">
+		AUTH_GRP_ID                authGrpId     ,
+		GRP_NM                     grpNm         ,
+		GRP_EXPLNT                 grpExplnt     ,
+		RGTR_ID                    rgtrId        ,
+		MDFR_ID                    mdfrId        ,
+		REG_DT                   regDt       ,
+		MDFCN_DT                     updDt         ,
+		DEL_YN                     delYn
+	</sql>
+	<sql id="ComAuthGrpTable">
+	    TB_AUTH_GRP_M
+	</sql>
+	<select id="selectList" parameterType="exts.com.vo.ComAuthGrpVO" resultType="exts.com.vo.ComAuthGrpVO">
+		SELECT
+			<include refid="ComAuthGrpColumn"/>
+		FROM
+			<include refid="ComAuthGrpTable"/>
+		<include refid="ComAuthGrpWhere"/>
+		ORDER BY
+			AUTH_GRP_ID DESC
+		<if test="recordCountPerPage != 0">
+			LIMIT #{firstIndex},#{recordCountPerPage}
+		</if>
+	</select>
+	<select id="selectTot" parameterType="exts.com.vo.ComAuthGrpVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="ComAuthGrpTable"/>
+		<include refid="ComAuthGrpWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.com.vo.ComAuthGrpVO" resultType="exts.com.vo.ComAuthGrpVO">
+		SELECT
+			<include refid="ComAuthGrpColumn"/>
+		FROM
+			<include refid="ComAuthGrpTable"/>
+		WHERE
+			AUTH_GRP_ID = #{authGrpId}
+	</select>
+	
+	<insert id="insert" parameterType="exts.com.vo.ComAuthGrpVO">
+		<selectKey resultType="string" keyProperty="authGrpId" order="BEFORE">
+			SELECT SEQ_TB_AUTH_GRP_M.NEXTVAL
+		</selectKey>  	
+		INSERT INTO TB_AUTH_GRP_M (
+			AUTH_GRP_ID     ,
+			GRP_NM          ,
+			GRP_EXPLNT      ,
+			RGTR_ID         ,
+			MDFR_ID         ,
+			REG_DT        ,
+			MDFCN_DT          ,
+			DEL_YN
+		) VALUES (
+			#{authGrpId}    ,
+			#{grpNm}        ,
+			#{grpExplnt}    ,
+			#{rgtrId}       ,
+			#{mdfrId}       ,
+			SYSDATETIME         ,
+			SYSDATETIME         ,
+			#{delYn}
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.com.vo.ComAuthGrpVO">
+		UPDATE 
+			TB_AUTH_GRP_M
+		SET
+			GRP_NM          = #{grpNm}          ,
+			GRP_EXPLNT      = #{grpExplnt}      ,
+			MDFR_ID         = #{mdfrId}         ,
+			MDFCN_DT          = SYSDATETIME           ,
+			DEL_YN          = #{delYn}
+		WHERE
+			AUTH_GRP_ID     = #{authGrpId}
+	</update>
+	
+	<update id="delete" parameterType="exts.com.vo.ComAuthGrpVO">
+		UPDATE
+			TB_AUTH_GRP_M
+		SET
+			DEL_YN          = 'Y'              ,
+			MDFR_ID         = #{mdfrId}        ,
+			MDFCN_DT          = SYSDATETIME
+		WHERE
+			AUTH_GRP_ID     = #{authGrpId}
+	</update>	
+</mapper>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.com.ComGrpMenuAuth">
+	
+		
+	<sql id="ComGrpMenuAuthWhere">
+		WHERE
+			1 = 1
+		<if test='authGrpId != null and !authGrpId.equals("")'>
+			AND AUTH_GRP_ID = #{authGrpId}
+		</if>
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"1".equals(searchCondition)'>
+				AND AUTH_GRP_ID LIKE '%'||#{searchKeyword}||'%'
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="ComGrpMenuAuthColumn">
+		AUTH_GRP_ID                authGrpId     ,
+		MENU_SN                   menuSn       ,
+		STRE_AUTH_YN               streAuthYn    ,
+		REDNG_AUTH_YN              redngAuthYn   ,
+		DEL_AUTH_YN                delAuthYn     ,
+		PRNTG_AUTH_YN              prntgAuthYn   ,
+		RGTR_ID                    rgtrId        ,
+		REG_DT                   regDt       
+	</sql>
+	<sql id="ComGrpMenuAuthTable">
+	    TB_GRP_MENU_AUTH_R
+	</sql>
+	<select id="selectList" parameterType="exts.com.vo.ComGrpMenuAuthVO" resultType="exts.com.vo.ComGrpMenuAuthVO">
+		SELECT
+			<include refid="ComGrpMenuAuthColumn"/>
+		FROM
+			<include refid="ComGrpMenuAuthTable"/>
+		<include refid="ComGrpMenuAuthWhere"/>
+		ORDER BY
+			AUTH_GRP_ID DESC
+		<if test="recordCountPerPage != 0">
+			LIMIT #{firstIndex},#{recordCountPerPage}
+		</if>
+	</select>
+	<select id="selectTot" parameterType="exts.com.vo.ComGrpMenuAuthVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="ComGrpMenuAuthTable"/>
+		<include refid="ComGrpMenuAuthWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.com.vo.ComGrpMenuAuthVO" resultType="exts.com.vo.ComGrpMenuAuthVO">
+		SELECT
+			<include refid="ComGrpMenuAuthColumn"/>
+		FROM
+			<include refid="ComGrpMenuAuthTable"/>
+		WHERE
+			AUTH_GRP_ID = #authGrpId#
+	</select>
+	
+	<insert id="insert" parameterType="exts.com.vo.ComGrpMenuAuthVO">
+		INSERT INTO TB_GRP_MENU_AUTH_R (
+			AUTH_GRP_ID     ,
+			MENU_SN        ,
+			STRE_AUTH_YN    ,
+			REDNG_AUTH_YN   ,
+			DEL_AUTH_YN     ,
+			PRNTG_AUTH_YN   ,
+			RGTR_ID         ,
+			REG_DT        
+		) VALUES (
+			#{authGrpId}    ,
+			#{menuSn}      ,
+			#{streAuthYn}   ,
+			#{redngAuthYn}  ,
+			#{delAuthYn}    ,
+			#{prntgAuthYn}  ,
+			#{rgtrId}       ,
+			SYSDATETIME         
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.com.vo.ComGrpMenuAuthVO">
+		UPDATE 
+			TB_GRP_MENU_AUTH_R
+		SET
+			MENU_SN        = #{menuSn}        ,
+			STRE_AUTH_YN    = #{streAuthYn}     ,
+			REDNG_AUTH_YN   = #{redngAuthYn}    ,
+			DEL_AUTH_YN     = #{delAuthYn}      ,
+			PRNTG_AUTH_YN   = #{prntgAuthYn}    
+		WHERE
+			AUTH_GRP_ID     = #{authGrpId}
+	</update>
+	
+	<delete id="delete" parameterType="exts.com.vo.ComGrpMenuAuthVO">
+		DELETE FROM
+			TB_GRP_MENU_AUTH_R
+		WHERE
+			AUTH_GRP_ID     = #{authGrpId}
+	</delete>	
+</mapper>

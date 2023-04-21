@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+@version 3.2.0.1
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<!--  공통코드 -->
+	<bean name="extsComCodeIdGnrService"
+		class="egovframework.rte.fdl.idgnr.impl.EgovTableIdGnrService"
+		destroy-method="destroy">
+		<property name="dataSource" ref="egov.dataSource" />
+		<property name="strategy" ref="extsComCodeIdGnrStrategy" />
+		<property name="blockSize" 	value="1"/>
+		<property name="table"	   	value="JNITSEQ"/>
+		<property name="tableName"	value="ADDON_COM_CODE"/>
+	</bean>
+	<bean name="extsComCodeIdGnrStrategy"
+		class="egovframework.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+		<property name="prefix" value="ACC_" />
+		<property name="cipers" value="16" />
+		<property name="fillChar" value="0" />
+	</bean>
+
+	<!--  공통코드 그룹 -->
+	<bean name="extsComCodeGrpIdGnrService"
+		class="egovframework.rte.fdl.idgnr.impl.EgovTableIdGnrService"
+		destroy-method="destroy">
+		<property name="dataSource" ref="egov.dataSource" />
+		<property name="strategy" ref="extsComCodeGrpIdGnrStrategy" />
+		<property name="blockSize" 	value="1"/>
+		<property name="table"	   	value="JNITSEQ"/>
+		<property name="tableName"	value="ADDON_COM_CODE_GRP"/>
+	</bean>
+	<bean name="extsComCodeGrpIdGnrStrategy"
+		class="egovframework.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+		<property name="prefix" value="ACCG_" />
+		<property name="cipers" value="15" />
+		<property name="fillChar" value="0" />
+	</bean>
+
+	<!-- 샘플 -->
+	<bean name="extsComSmplIdGnrService"
+		class="egovframework.rte.fdl.idgnr.impl.EgovTableIdGnrService"
+		destroy-method="destroy">
+		<property name="dataSource" ref="egov.dataSource" />
+		<property name="strategy" ref="extsComSmplIdGnrStrategy" />
+		<property name="blockSize" 	value="1"/>
+		<property name="table"	   	value="JNITSEQ"/>
+		<property name="tableName"	value="ADDON_COM_SMPL"/>
+	</bean>
+	<bean name="extsComSmplIdGnrStrategy"
+		class="egovframework.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+		<property name="prefix" value="ACS_" />
+		<property name="cipers" value="16" />
+		<property name="fillChar" value="0" />
+	</bean>
+</beans>

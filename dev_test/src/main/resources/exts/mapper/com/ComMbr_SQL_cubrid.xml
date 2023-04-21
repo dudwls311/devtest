@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.com.ComMbr">
+	
+		
+	<sql id="comMbrWhere">
+		WHERE
+			m.ISDEL = 0
+		<if test='mbrId != null and !mbrId.equals("")'>
+			AND m.MBR_ID = #{mbrId}
+		</if>
+		<if test='mbrLogin != null and !mbrLogin.equals("")'>
+			AND m.MBR_LOGIN = #{typeId}
+		</if>
+		<if test='notmbrLogin != null and !notmbrLogin.equals("")'>
+			AND m.MBR_LOGIN != #{notmbrLogin}
+		</if>
+		<if test='orgId != null and !orgId.equals("")'>
+			AND m.ORG_ID = #{orgId}
+		</if>
+		<if test='typeId != null and !typeId.equals("")'>
+			AND m.TYPE_ID = #{typeId}
+		</if>
+		<choose>
+			<when test='"1".equals(selectCondition)'>
+				AND (m.EXPIRE_DATE IS NULL OR TO_CHAR(SYSDATETIME,'YYYYMMDD') &lt;= TO_CHAR(m.EXPIRE_DATE,'YYYYMMDD'))
+			</when>
+			<when test='"2".equals(selectCondition)'>
+				AND m.EXPIRE_DATE IS NOT NULL AND TO_CHAR(SYSDATETIME,'YYYYMMDD') &gt; TO_CHAR(m.EXPIRE_DATE,'YYYYMMDD')
+			</when>
+			<when test='"3".equals(selectCondition)'>
+				AND m.PW_MISCNT &gt; #{ex01}
+			</when>
+		</choose>
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"0".equals(searchCondition)'>
+					AND (
+						m.MBR_NM LIKE '%'||#{searchKeyword}||'%'
+						OR m.MBR_LOGIN LIKE '%'||#{searchKeyword}||'%'
+					)
+				</when>
+			</choose>			
+		</if>
+	</sql>
+	<sql id="comMbrColumn">
+		m.MBR_ID                   mbrId              ,
+		m.MBR_LOGIN                mbrLogin              ,
+		m.ORG_ID                   orgId              ,
+		m.MBR_NM                   mbrNm              ,
+		m.PASSWD                   passwd              ,
+		m.TYPE_ID                  typeId              ,
+		m.EXPIRE_DATE              expireDate              ,
+		m.PW_MISCNT                pwMiscnt                 ,
+		m.LOCK_DATE                lockDate                 ,
+		m.SN                sn                 ,
+		m.DP                dp                 ,
+		m.CREATED                 created            ,
+		m.MODIFIED                   modified	,
+		
+		ma.GENDER_CD		genderCd		,
+		ma.BRDT_YMD		brdtYmd		,
+		ma.RRNO            rrno       ,
+		ma.NTKRDF_UNQ_NO		ntkrdfUnqNo ,
+		ma.HANAWON_TH		hanawonTh		,
+		ma.ENTCNY_YMD			entcnyYmd	,
+		ma.PRTDCS_YMD			prtdcsYmd	,
+		ma.HANAWON_FNSH_YMD	hanawonFnshYmd	,
+		ma.MBPHNO		mbphno		,
+		ma.TELNO		telno		,
+		ma.ZIP		zip		,
+		ma.ADDR		addr		,
+		ma.DADDR		daddr	
+	</sql>
+	<sql id="comMbrTable">
+	    JNITCMSMBR m
+	    LEFT JOIN TB_MBR_ADTIFM ma ON (ma.MBR_ID = m.MBR_ID)
+	</sql>
+	<select id="selectList" parameterType="exts.com.vo.ComMbrVO" resultType="exts.com.vo.ComMbrVO">
+		SELECT
+			<include refid="comMbrColumn"/>
+		FROM
+			<include refid="comMbrTable"/>
+		<include refid="comMbrWhere"/>
+		ORDER BY
+			m.CREATED DESC
+		<if test="recordCountPerPage != 0">
+			LIMIT #{firstIndex},#{recordCountPerPage}
+		</if>
+	</select>
+	<select id="selectTot" parameterType="exts.com.vo.ComMbrVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="comMbrTable"/>
+		<include refid="comMbrWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.com.vo.ComMbrVO" resultType="exts.com.vo.ComMbrVO">
+		SELECT
+			<include refid="comMbrColumn"/>
+		FROM
+			<include refid="comMbrTable"/>
+		WHERE
+		<choose>
+			<when test='dp != null and !dp.equals("")'>
+				m.DP = #{dp}
+			</when>
+			<when test='sn != null and !sn.equals("")'>
+				m.SN = #{sn}
+			</when>
+			<otherwise>
+				m.MBR_ID = #{mbrId}
+			</otherwise>
+		</choose>
+			
+	</select>
+	
+	<update id="updateUserKey" parameterType="exts.com.vo.ComMbrVO">
+		UPDATE
+			JNITCMSMBR
+		SET
+			SN = #{sn}
+		WHERE
+			DP = #{dp}
+	</update>
+	
+	<update id="mergeMbrAdt" parameterType="exts.com.vo.ComMbrVO">
+		MERGE INTO
+			TB_MBR_ADTIFM 
+			USING dual
+				ON (MBR_ID = #{mbrId})
+			WHEN MATCHED THEN
+				UPDATE
+				SET 
+					GENDER_CD		    = #{genderCd}		,
+					BRDT_YMD		    = REPLACE(REPLACE(#{brdtYmd},'-',''),'.','')		,
+					RRNO                = #{rrno}		,
+					NTKRDF_UNQ_NO	    = #{ntkrdfUnqNo}		,
+					HANAWON_TH		    = #{hanawonTh}		,
+					ENTCNY_YMD		    = REPLACE(REPLACE(#{entcnyYmd},'-',''),'.','')		,
+					PRTDCS_YMD		    = REPLACE(REPLACE(#{prtdcsYmd},'-',''),'.','')		,
+					HANAWON_FNSH_YMD    = REPLACE(REPLACE(#{hanawonFnshYmd},'-',''),'.','')		,
+					MBPHNO	            = #{mbphno}		,
+					TELNO	            = #{telno}		,
+					ZIP		            = #{zip}		,
+					ADDR	            = #{addr}		,
+					DADDR	            = #{daddr}		
+			WHEN NOT MATCHED THEN
+				INSERT (
+					MBR_ID		,
+					GENDER_CD		,
+					BRDT_YMD		,
+					RRNO            ,
+					NTKRDF_UNQ_NO		,
+					HANAWON_TH		,
+					ENTCNY_YMD			,
+					PRTDCS_YMD			,
+					HANAWON_FNSH_YMD	,
+					MBPHNO		,
+					TELNO		,
+					ZIP		,
+					ADDR		,
+					DADDR		
+				)VALUES (
+					#{mbrId}		,
+					#{genderCd}		,
+					REPLACE(REPLACE(#{brdtYmd},'-',''),'.','')		,
+					#{rrno}          ,
+					#{ntkrdfUnqNo}		,
+					#{hanawonTh}		,
+					REPLACE(REPLACE(#{entcnyYmd},'-',''),'.','')	,
+					REPLACE(REPLACE(#{prtdcsYmd},'-',''),'.','')	,
+					REPLACE(REPLACE(#{hanawonFnshYmd},'-',''),'.','')	,
+					#{mbphno}		,
+					#{telno}		,
+					#{zip}		,
+					#{addr}		,
+					#{daddr}		
+				)
+
+	</update>
+	
+<!-- 신청 정보 매핑용 -->
+	<sql id="mbrAdtColumn">	
+		ma.NTKRDF_UNQ_NO				ntkrdfUnqNo		,
+		ma.HANAWON_TH					hanawonTh		,
+		ma.ENTCNY_YMD					entcnyYmd	,
+		ma.PRTDCS_YMD					prtdcsYmd	,
+		ma.HANAWON_FNSH_YMD				hanawonFnshYmd			
+	</sql>
+	<sql id="mbrAdtTable">
+		LEFT JOIN TB_MBR_ADTIFM ma ON (s.RGTR_ID = ma.MBR_ID)
+	</sql>
+</mapper>

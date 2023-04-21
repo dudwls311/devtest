@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.com.ComCode">
+	
+		
+	<sql id="ComCodeWhere">
+		WHERE
+			DEL_YN = 'N'
+		<if test='upIndivCd != null and !upIndivCd.equals("")'>
+			AND UP_INDIV_CD = #{upIndivCd}
+		</if>
+		<if test='groupCd != null and !groupCd.equals("")'>
+			AND GROUP_CD = #{groupCd}
+		</if>
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"1".equals(searchCondition)'>
+				AND INDIV_CD_NM LIKE '%'||#{searchKeyword}||'%'
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="ComCodeColumn">
+		INDIV_CD             indivCd      ,
+		GROUP_CD             groupCd     ,
+		UP_INDIV_CD          upIndivCd     ,
+		INDIV_CD_NM          indivCdNm      ,
+		INDIV_CD_SORT_SN     indivCdSortSn ,
+		INDIV_CD_CHG_YN		 indivCdChgYn  ,
+		INDIV_CD_VL_FRST     indivCdVlFrst     ,
+		INDIV_CD_VL_SCNDRY   indivCdVlScndry     ,
+		INDIV_CD_VL_THIRD    indivCdVlThird     ,
+		INDIV_CD_EXPLN       indivCdExpln  ,
+		RGTR_ID              rgtrId  ,
+		MDFR_ID              mdfrId ,
+		REG_DT               regDt    ,
+		MDFCN_DT             mdfcnDt   ,
+		DEL_YN               delYn
+	</sql>
+	<sql id="ComCodeTable">
+	    TB_CMMN_INDIV_CD
+	</sql>
+	<select id="selectList" parameterType="exts.com.vo.ComCodeVO" resultType="exts.com.vo.ComCodeVO">
+		SELECT
+			<include refid="ComCodeColumn"/>
+		FROM
+			<include refid="ComCodeTable"/>
+		<include refid="ComCodeWhere"/>
+		ORDER BY
+			UP_INDIV_CD , 
+			INDIV_CD_SORT_SN ASC
+		<if test="recordCountPerPage != 0">
+			LIMIT #{firstIndex},#{recordCountPerPage}
+		</if>
+		
+	</select>
+	<select id="selectTot" parameterType="exts.com.vo.ComCodeVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="ComCodeTable"/>
+		<include refid="ComCodeWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.com.vo.ComCodeVO" resultType="exts.com.vo.ComCodeVO">
+		SELECT
+			<include refid="ComCodeColumn"/>
+		FROM
+			<include refid="ComCodeTable"/>
+		WHERE
+			INDIV_CD = #{indivCd}
+	</select>
+	
+	<insert id="insert" parameterType="exts.com.vo.ComCodeVO">
+		<selectKey resultType="string" keyProperty="indivCd" order="BEFORE">
+			SELECT 
+				DECODE(NVL(MAX(TO_NUMBER(INDIV_CD))+1,0),0,1,MAX(TO_NUMBER(INDIV_CD))+1)
+			FROM TB_CMMN_INDIV_CD 
+			WHERE GROUP_CD = #{groupCd}
+		</selectKey>
+		INSERT INTO TB_CMMN_INDIV_CD (
+			INDIV_CD                     ,
+			UP_INDIV_CD                    ,
+			GROUP_CD                   ,
+			INDIV_CD_NM                     ,
+			INDIV_CD_EXPLN                 ,
+			INDIV_CD_VL_FRST                    ,
+			INDIV_CD_VL_SCNDRY                    ,
+			INDIV_CD_VL_THIRD                    ,
+			INDIV_CD_SORT_SN               ,
+			INDIV_CD_CHG_YN                ,
+			RGTR_ID                 ,
+			MDFR_ID                ,
+			REG_DT                    ,
+			MDFCN_DT                   ,
+			DEL_YN
+		) VALUES (
+			#{indivCd}                   ,
+			NVL(#{upIndivCd},#{indivCd}) ,
+			#{groupCd}                  ,
+			#{indivCdNm}                   ,
+			#{indivCdExpln}               ,
+			#{indivCdVlFrst}                  ,
+			#{indivCdVlScndry}                  ,
+			#{indivCdVlThird}                  ,
+			#{indivCdSortSn}              ,
+			#{indivCdChgYn}               ,
+			#{rgtrId}               ,
+			#{mdfrId}              ,
+			SYSDATETIME                      ,
+			SYSDATETIME                      ,
+			'N'
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.com.vo.ComCodeVO">
+		UPDATE 
+			TB_CMMN_INDIV_CD
+		SET
+			INDIV_CD_NM			= #{indivCdNm}           ,
+			INDIV_CD_EXPLN  	= #{indivCdExpln}       ,
+			INDIV_CD_VL_FRST    = #{indivCdVlFrst}          ,
+			INDIV_CD_VL_SCNDRY  = #{indivCdVlScndry}          ,
+			INDIV_CD_VL_THIRD   = #{indivCdVlThird}          ,
+			<!--
+			UP_INDIV_CD  	    = #{upIndivCd}          ,
+			GROUP_CD   		= #{groupCd}          ,
+			-->
+			INDIV_CD_SORT_SN	= #{indivCdSortSn}      ,
+			INDIV_CD_CHG_YN		= #{indivCdChgYn}       ,
+			MDFR_ID		= #{mdfrId}      ,
+			MDFCN_DT		= SYSDATETIME          
+		WHERE
+			INDIV_CD = #{indivCd}
+	</update>
+	
+	<update id="delete" parameterType="exts.com.vo.ComCodeVO">
+		UPDATE
+			TB_CMMN_INDIV_CD
+		SET
+			DEL_YN		= 'N'		,
+			MDFR_ID		= #{mdfrId}	,
+			MDFCN_DT	= SYSDATETIME
+		WHERE
+			INDIV_CD = #{indivCd}
+	</update>	
+	
+	
+	<select id="selectListSimpleByUpCd" parameterType="String" resultType="exts.com.vo.ComCodeVO">
+		SELECT
+			INDIV_CD			indivCd      ,
+			INDIV_CD_NM         indivCdNm          
+		FROM
+			TB_CMMN_INDIV_CD
+		WHERE
+			DEL_YN = 'N'
+			AND UP_INDIV_CD = #{upIndivCd}
+		ORDER BY
+			INDIV_CD_SORT_SN ASC
+	</select>
+	
+	<select id="selectListSimpleByGroupCd" parameterType="String" resultType="exts.com.vo.ComCodeVO">
+		SELECT
+			INDIV_CD			indivCd      ,
+			INDIV_CD_NM          indivCdNm          
+		FROM
+			TB_CMMN_INDIV_CD
+		WHERE
+			DEL_YN = 'N'
+			AND INDIV_CD != GROUP_CD
+			AND GROUP_CD = #{groupCd}
+		ORDER BY
+			INDIV_CD_SORT_SN ASC
+	</select>
+</mapper>

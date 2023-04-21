@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.com.ComIndvlzMenuAuthChng">
+	
+		
+	<sql id="ComIndvlzMenuAuthChngWhere">
+		WHERE
+			1 = 1
+		<if test='authGrpId != null and !authGrpId.equals("")'>
+			AND h.AUTH_GRP_ID = #{authGrpId}
+		</if>
+		<if test='mbrId != null and !mbrId.equals("")'>
+			AND h.MBR_ID = #{mbrId}
+		</if>
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"1".equals(searchCondition)'>
+				AND gm.MBR_NM LIKE '%'||#{searchKeyword}||'%'
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="ComIndvlzMenuAuthChngColumn">
+		h.CHNG_HIST_SN              chngHistSn   ,
+		h.AUTH_GRP_ID                authGrpId     ,
+		h.MENU_SN                   menuSn       ,
+		h.STRE_AUTH_YN               streAuthYn    ,
+		h.REDNG_AUTH_YN              redngAuthYn   ,
+		h.DEL_AUTH_YN                delAuthYn     ,
+		h.PRNTG_AUTH_YN              prntgAuthYn   ,
+		h.RGTR_ID                    rgtrId        ,
+		h.REG_DT                   regDt       ,
+		gm.MBR_NM                    mbrNm         ,
+		mm.MBR_NM                    crtrNm        ,
+		SUBSTR(SYS_CONNECT_BY_PATH(m.MENU_NM, ' > '),3) menuNm
+	</sql>
+	<sql id="ComIndvlzMenuAuthChngTable">
+	    TB_INDVLZ_MENU_AUTH_CHNG_H h
+	    LEFT JOIN JNITCMSMBR gm ON (gm.MBR_ID = h.MBR_ID)
+	    LEFT JOIN JNITCMSMBR mm ON (mm.MBR_ID = h.RGTR_ID)
+	    LEFT JOIN TB_MENU_M m ON (m.MENU_SN = h.MENU_SN)
+	</sql>
+	<select id="selectList" parameterType="exts.com.vo.ComIndvlzMenuAuthChngVO" resultType="exts.com.vo.ComIndvlzMenuAuthChngVO">
+		SELECT
+			<include refid="ComIndvlzMenuAuthChngColumn"/>
+		FROM
+			<include refid="ComIndvlzMenuAuthChngTable"/>
+		<include refid="ComIndvlzMenuAuthChngWhere"/>
+		START WITH m.UPR_MENU_SN = 0 
+		CONNECT BY PRIOR m.MENU_SN = m.UPR_MENU_SN
+		ORDER BY
+			h.CHNG_HIST_SN DESC
+		<if test="recordCountPerPage != 0">
+			LIMIT #{firstIndex},#{recordCountPerPage}
+		</if>
+	</select>
+	<select id="selectTot" parameterType="exts.com.vo.ComIndvlzMenuAuthChngVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="ComIndvlzMenuAuthChngTable"/>
+		<include refid="ComIndvlzMenuAuthChngWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.com.vo.ComIndvlzMenuAuthChngVO" resultType="exts.com.vo.ComIndvlzMenuAuthChngVO">
+		SELECT
+			<include refid="ComIndvlzMenuAuthChngColumn"/>
+		FROM
+			<include refid="ComIndvlzMenuAuthChngTable"/>
+		WHERE
+			h.MBR_ID = #{mbrId}
+		START WITH m.UPR_MENU_SN = 0 
+		CONNECT BY PRIOR m.MENU_SN = m.UPR_MENU_SN
+	</select>
+	
+	<insert id="insert" parameterType="exts.com.vo.ComIndvlzMenuAuthChngVO">
+		INSERT INTO TB_INDVLZ_MENU_AUTH_CHNG_H (
+			MBR_ID          ,
+			AUTH_GRP_ID     ,
+			MENU_SN        ,
+			STRE_AUTH_YN    ,
+			REDNG_AUTH_YN   ,
+			DEL_AUTH_YN     ,
+			PRNTG_AUTH_YN   ,
+			RGTR_ID         ,
+			REG_DT        
+		) VALUES (
+			#{mbrId}        ,
+			#{authGrpId}    ,
+			#{menuSn}      ,
+			#{streAuthYn}   ,
+			#{redngAuthYn}  ,
+			#{delAuthYn}    ,
+			#{prntgAuthYn}  ,
+			#{rgtrId}       ,
+			SYSDATETIME         
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.com.vo.ComIndvlzMenuAuthChngVO">
+		UPDATE 
+			TB_INDVLZ_MENU_AUTH_CHNG_H
+		SET
+			MENU_SN        = #{menuSn}        ,
+			STRE_AUTH_YN    = #{streAuthYn}     ,
+			REDNG_AUTH_YN   = #{redngAuthYn}    ,
+			DEL_AUTH_YN     = #{delAuthYn}      ,
+			PRNTG_AUTH_YN   = #{prntgAuthYn}    
+		WHERE
+			MBR_ID = #{mbrId}
+	</update>
+	
+	<delete id="delete" parameterType="exts.com.vo.ComIndvlzMenuAuthChngVO">
+		DELETE FROM
+			TB_INDVLZ_MENU_AUTH_CHNG_H
+		WHERE
+			MBR_ID = #{mbrId}
+	</delete>	
+	
+	<insert id="insertAll" parameterType="exts.com.vo.ComIndvlzMenuAuthChngVO">
+		INSERT INTO TB_INDVLZ_MENU_AUTH_CHNG_H
+		SELECT
+			MBR_ID          ,
+			MENU_SN        ,
+			AUTH_GRP_ID     ,
+			SEQ_TB_INDVLZ_MENU_AUTH_CHNG_H.NEXTVAL ,
+			STRE_AUTH_YN    ,
+			REDNG_AUTH_YN   ,
+			DEL_AUTH_YN     ,
+			PRNTG_AUTH_YN   ,
+			REG_DT        ,
+			RGTR_ID         
+		FROM
+			TB_INDVLZ_MENU_AUTH_R
+		WHERE
+			MBR_ID = #{mbrId}
+	</insert>
+</mapper>

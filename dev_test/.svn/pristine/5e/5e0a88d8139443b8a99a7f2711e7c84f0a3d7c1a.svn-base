@@ -1,0 +1,73 @@
+﻿#[Domain Configure]
+use.Domain=true
+Domain.Name=/0Jjt2GBdRLCaIEipxvvKg==
+Domain.IP=xj7yYHBxCzZMMIYB1lo7pw==
+Domain.Port=gHyigC5h+B2eTcXEDrTh5g==
+
+#[Server Configure]
+use.ServerHA=false
+Server.PrimaryIP=xj7yYHBxCzZMMIYB1lo7pw==
+Server.PrimaryPort=+DKNECMpkpLP26A18QQMrw==
+Server.SecondIP=0.0.0.0
+Server.SecondPort=9003
+
+#[About Key Configure]
+use.ObjectFile=false
+ObjectFilePath=Tvd5VVrvnMuVckZVYlNEENohkyIKx1mA94mW6a/NpSutssppZK4KEBnS5m7KUXRs
+
+#[ObjectFileOverwrite]
+use.ObjectFileOverwrite=true
+
+#[API Enviroment Configure]
+#0: Not Check Duplication, 1: Return Data, 2:Return Exception(-1)
+Enc.DuplicationType=0
+Dec.DuplicationType=0
+
+#TRUE : Input Key Info (SCHEMA, TABLE_NAME, COLUMN) when Key Fix , FALSE : Receive Key Info From Server
+Enc.KeyFixType=true
+
+#true : Encrypt Null Data, false : no Encrypt Null Data 
+Enc.EncNull=false
+
+#[POLICY NAME (S.T.C) INFO]
+#(Split True : use before Key Policy : False use merge Key Policy)
+Enc.PolicySplit=true
+Enc.PolicyName=SCHEMA.TABLE.COLUMN
+
+#[Encrypt/Decrypt By Pass Option (true : pass, False : non pass)]
+# Default true (Encrypt/Decrypt)
+Use.SecureByPass=false
+
+#[Encrypt/Decrypt Fixed Length]
+# Default : 13
+OriginalFixedLength=13
+
+#[Server Time Out]
+# Default : 3
+Server.TimeOut=3
+
+#[Encrypt File Option]=====================================================================================
+# File Duplication Check
+# (일반 파일암호화) 					[0] : Not Check Duplication
+# (이중암호화방지 파일암호화) [n] : 이중 암호화 체크하지 않고 암호화 진행
+# (이중암호화방지 파일암호화) [1] : 이중 암호화 체크 및 이중 암호화 발견 시 Return true
+# (이중암호화방지 파일암호화) [2] : 이중 암호화 체크 및 이중 암호화 발견 시 Return true & Copy Org File
+# (이중암호화방지 파일암호화) [3] : 이중 암호화 체크 및 이중 암호화 발견 시 Return Exception(-1)
+File.EncDuplicationType=0
+
+# Directory of Backup Original File
+# 암호화 대상파일을 지정할 경우에만 사용가능
+File.BackupFilePath=VmAUhKhPMU7O606Q6NPb1/IooJU2zTXfgDviShRBbi4=
+File.DeleteBackupFile=true
+
+# File Forgery Verification Check
+# 파일 이중 암복호화 체크 사용 시에만 사용가능
+File.ForgeryVerification=false
+
+
+
+UseFixedEncBakDirectory=true
+FixedEncBakDirectory=oJprgULEushFoUqK0t1Nyg==
+
+UseFixedDecDirectory=true
+FixedDecDirectory=GYGzw2ygHMq3j46DylspEg==

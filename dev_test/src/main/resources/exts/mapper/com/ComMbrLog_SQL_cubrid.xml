@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.com.ComMbrLog">
+		
+	<sql id="ComMbrLogWhere">
+		WHERE
+			ml.DEL_YN = 'N'
+	<choose>
+		<when test='searchStart != null and !searchStart.equals("") and searchEnd != null and !searchEnd.equals("")'>
+			AND ml.LOG_REG_DT BETWEEN TO_DATE(#{searchStart} ,'YYYY.MM.DD') AND TO_DATE(#{searchEnd}||' 23:59:59','YYYY.MM.DD HH24:MI:SS')
+		</when>
+		<when test='searchStart != null and !searchStart.equals("")'>
+			AND TO_CHAR(ml.LOG_REG_DT ,'YYYY.MM.DD') &gt;= #{searchStart}
+		</when>
+		<when test='searchEnd != null and !searchEnd.equals("")'>
+			AND TO_CHAR(ml.LOG_REG_DT ,'YYYY.MM.DD') &lt;= #{searchEnd}
+		</when>
+	</choose>
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"1".equals(searchCondition)'>
+					AND jcm.MBR_LOGIN = #{searchKeyword}
+				</when>
+				<when test='"2".equals(searchCondition)'>
+					AND mem.MENU_NM = #{searchKeyword}
+				</when>
+				<when test='"3".equals(searchCondition)'>
+					AND ml.LOG_CNTS = #{searchKeyword}
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="ComMbrLogColumn">
+		ml.MBR_LOG_SN		mbrLogSn		,
+		ml.MBR_ID		mbrId		,
+		ml.LOG_DATE		logDate		,
+		ml.MENU_SN		menuSn		,
+		ml.LOG_REG_DT		logRegDt		,
+		ml.LOG_CNTS		logCnts		,
+		ml.DEL_YN		delYn		,
+		
+		jcm.MBR_LOGIN	mbrLogin	,
+		jcm.MBR_NM		mbrNm		,
+		mem.MENU_NM		menuNm
+	</sql>
+	<sql id="ComMbrLogTable">
+	    TB_MBR_LOG ml
+	    LEFT JOIN JNITCMSMBR jcm ON (ml.MBR_ID = jcm.MBR_ID)
+	    LEFT JOIN TB_MENU_M  mem ON (mem.MENU_SN = ml.MENU_SN)
+	</sql>
+	<select id="selectList" parameterType="exts.com.vo.ComMbrLogVO" resultType="exts.com.vo.ComMbrLogVO">
+		SELECT
+			<include refid="ComMbrLogColumn"/>
+		FROM
+			<include refid="ComMbrLogTable"/>
+		<include refid="ComMbrLogWhere"/>
+		ORDER BY
+			ml.MBR_LOG_SN DESC
+		<if test="recordCountPerPage != 0">
+			LIMIT #{firstIndex},#{recordCountPerPage}
+		</if>
+	</select>
+	<select id="selectTot" parameterType="exts.com.vo.ComMbrLogVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="ComMbrLogTable"/>
+		<include refid="ComMbrLogWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.com.vo.ComMbrLogVO" resultType="exts.com.vo.ComMbrLogVO">
+		SELECT
+			<include refid="ComMbrLogColumn"/>
+		FROM
+			<include refid="ComMbrLogTable"/>
+		WHERE
+			ml.DEL_YN = 'N'
+			AND ml.MBR_LOG_SN = #{mbrLogSn}
+	</select>
+	
+	<insert id="insert" parameterType="exts.com.vo.ComMbrLogVO">
+		<selectKey resultType="string" keyProperty="mbrLogSn" order="BEFORE">
+			SELECT SEQ_TB_MBR_LOG.NEXTVAL  			      
+		</selectKey>
+		INSERT INTO TB_MBR_LOG (
+			MBR_LOG_SN		,
+			MBR_ID		,
+			LOG_DATE		,
+			MENU_SN		,
+			LOG_REG_DT		,
+			LOG_CNTS		,
+			DEL_YN
+		) VALUES (
+			#{mbrLogSn}		,
+			#{mbrId}		,
+			TO_CHAR(SYSDATETIME,'YYYYMMDD')		,
+			#{menuSn}		,
+			SYSDATETIME		,
+			#{logCnts}		,
+			'N'
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.com.vo.ComMbrLogVO">
+		UPDATE 
+			TB_MBR_LOG
+		SET
+			LOG_DATE	=	#{logDate}		,
+			MENU_SN	=	#{menuSn}		,
+			LOG_REG_DT	=	#{logRegDt}		,
+			LOG_CNTS	=	#{logCnts}
+		WHERE
+			MBR_LOG_SN = #{mbrLogSn}
+	</update>
+	
+	<update id="delete" parameterType="exts.com.vo.ComMbrLogVO">
+		UPDATE
+			TB_MBR_LOG
+		SET
+			DEL_YN             = 'Y'
+		WHERE
+			MBR_LOG_SN = #{mbrLogSn}
+	</update>	
+</mapper>

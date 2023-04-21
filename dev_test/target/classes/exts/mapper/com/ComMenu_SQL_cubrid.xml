@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.com.ComMenu">
+	
+		
+	<sql id="comMenuWhere">
+		WHERE
+			CM.DEL_YN = 'N'
+		<if test='menuLvlVl != null and !menuLvlVl.equals("")'>
+			AND CM.MENU_LVL_VL = #{menuLvlVl}
+		</if>
+		<if test='uprMenuSn != null and !uprMenuSn.equals("")'>
+			AND CM.UPR_MENU_SN = #{uprMenuSn}
+		</if>
+		<if test='menuUrl != null and !menuUrl.equals("")'>
+			AND CM.MENU_URL = #{menuUrl}
+		</if>
+		
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"1".equals(searchCondition)'>
+				AND (
+					CM.MENU_SN LIKE '%'||#{searchKeyword}||'%'
+					OR CM.MENU_NM LIKE '%'||#{searchKeyword}||'%'
+					OR CM.UPR_MENU_SN LIKE '%'||#{searchKeyword}||'%'
+				)
+				</when>
+			</choose>			
+		</if>
+	</sql>
+	<sql id="comMenuColumn">
+		CM.MENU_SN menuSn,
+		CM.MENU_NM menuNm,
+		CM.MENU_URL menuUrl,
+		CM.UPR_MENU_SN uprMenuSn,
+		CM.MENU_LVL_VL menuLvlVl,
+		CM.MENU_SEQ menuSeq,
+		CM.MENU_EXPLNT menuExplnt,
+		CM.DEL_YN useYn
+	</sql>
+	<sql id="comMenuTable">
+	    TB_MENU_M CM
+	</sql>
+	<select id="selectList" parameterType="exts.com.vo.ComMenuVO" resultType="exts.com.vo.ComMenuVO">
+		SELECT
+			<include refid="comMenuColumn"/>
+		FROM
+			<include refid="comMenuTable"/>
+		<include refid="comMenuWhere"/>
+		ORDER BY
+			CM.UPR_MENU_SN ASC, CM.MENU_SEQ ASC, CM.MENU_NM ASC
+		<if test="recordCountPerPage != 0">
+			LIMIT #{firstIndex},#{recordCountPerPage}
+		</if>
+	</select>
+	<select id="selectTot" parameterType="exts.com.vo.ComMenuVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="comMenuTable"/>
+		<include refid="comMenuWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.com.vo.ComMenuVO" resultType="exts.com.vo.ComMenuVO">
+		SELECT
+			<include refid="comMenuColumn"/>
+		FROM
+			<include refid="comMenuTable"/>
+		WHERE
+			CM.MENU_SN = #{menuSn}
+	</select>
+	
+	<insert id="insert" parameterType="exts.com.vo.ComMenuVO">
+		<selectKey resultType="string" keyProperty="menuSn" order="BEFORE">
+			SELECT SEQ_TB_MENU_M.NEXTVAL  			      
+		</selectKey>  	
+		INSERT INTO TB_MENU_M (
+			MENU_SN,
+			MENU_NM,
+			MENU_URL,
+			UPR_MENU_SN,
+			MENU_LVL_VL,
+			MENU_SEQ,
+			MENU_EXPLNT,
+			DEL_YN,
+			REG_DT,
+			REGSTR_ID,
+			UPD_DT,
+			UPDR_ID
+		) VALUES (
+			#{menuSn},
+			#{menuNm},
+			#{menuUrl},
+			NVL(#{uprMenuSn},'0'),
+			#{menuLvlVl},
+			#{menuSeq},
+			#{menuExplnt},
+			'Y',
+			SYSDATETIME,
+			#{regstrId},
+			SYSDATETIME,
+			#{updrId}
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.com.vo.ComMenuVO">
+		UPDATE 
+			TB_MENU_M
+		SET
+			MENU_NM = #{menuNm},
+			MENU_URL = #{menuUrl},
+			UPR_MENU_SN = #{uprMenuSn},
+			MENU_LVL_VL = #{menuLvlVl},
+			MENU_SEQ = #{menuSeq},
+			MENU_EXPLNT = #{menuExplnt},
+			UPD_DT = SYSDATETIME,
+			UPDR_ID = #{updrId}
+		WHERE
+			MENU_SN = #{menuSn}
+	</update>
+
+	<update id="delete" parameterType="exts.com.vo.ComMenuVO">
+		UPDATE
+			TB_MENU_M
+		SET
+			DEL_YN = 'Y',
+			UPD_DT = SYSDATETIME,
+			UPDR_ID = #{updrId}
+		WHERE
+			MENU_SN = #{menuSn}
+	</update>	
+	<update id="deleteByIds" parameterType="exts.com.vo.ComMenuVO">
+		UPDATE
+			TB_MENU_M
+		SET
+			DEL_YN = 'Y',
+			UPD_DT = SYSDATETIME,
+			UPDR_ID = #{updrId}
+		WHERE
+			MENU_SN IN 
+			<foreach collection="menuSns" open="(" close=")" separator="," item="item">#{item}</foreach>
+	</update>	
+	
+	<select id="selectTotChildrenByIds" parameterType="exts.com.vo.ComMenuVO" resultType="Integer">
+		SELECT 
+			COUNT(*) AS TOTAL
+		FROM 
+			TB_MENU_M 
+		WHERE
+			DEL_YN = 'Y'
+			AND MENU_SN != #{menuSn}
+			AND UPR_MENU_SN IN (
+				SELECT 
+					MENU_SN
+				FROM 
+					TB_MENU_M 
+				WHERE 
+					DEL_YN = 'Y' 
+				START WITH 
+					MENU_SN = #{menuSn}
+				CONNECT BY 
+					PRIOR MENU_SN = UPR_MENU_SN
+			)
+					
+	</select>	
+	
+	<!-- 
+	<select id="selectTreeList" parameterType="exts.com.vo.ComMenuVO" resultType="exts.com.vo.ComMenuVO">
+		SELECT 
+			MENU_SN menuSn,
+			MENU_NM menuNm,
+			MENU_URL menuUrl,
+			UPR_MENU_SN uprMenuSn,
+			MENU_LVL_VL menuLvlVl,
+			MENU_SEQ menuSeq,
+			MENU_EXPLNT menuExplnt,
+		FROM 
+			TB_MENU_M
+		WHERE
+			DEL_YN = 'N'
+		START WITH 
+			MENU_LVL_VL = 1
+		CONNECT BY 
+			PRIOR MENU_SN = UPR_MENU_SN
+	</select>
+	 -->
+</mapper>

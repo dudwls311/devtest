@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+@version 3.2.0.1
+-->
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="JnitboardinfoStatistic">
+	
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="jnitcmsboardinfoStatisticVO" type="jnit.board.info.statistic.JnitboardinfoStatisticVO"/>
+	
+	<resultMap id="JnitboardinfoStatistic" class="jnit.board.info.statistic.JnitboardinfoStatisticVO">
+		<result property="boardId" column="BOARD_ID" columnIndex="1"/>
+		<result property="boardGroup" column="BOARD_GROUP" columnIndex="2"/>
+		<result property="boardTitle" column="BOARD_TITLE" columnIndex="3"/>
+		<result property="totalCount" column="TOTAL_COUNT" columnIndex="4"/>
+		<result property="totalView" column="TOTAL_VIEW" columnIndex="5"/>
+	</resultMap>
+	
+	<select id="jnitboardinfoStatisticDAO.selectJnitboardinfoStatisticList_D" parameterClass="jnitcmsboardinfoStatisticVO" resultClass="egovMap">
+		SELECT
+			A.BOARD_ID
+			, B.BOARD_GROUP
+			, B.BOARD_TITLE
+			, A.TOTAL_COUNT
+			, A.TOTAL_VIEW
+		FROM (
+			SELECT
+				NULL AS BOARD_ID
+				, 0 AS TOTAL_COUNT
+				, 0 AS TOTAL_VIEW 
+			FROM
+				DUAL
+			<iterate property="boardIds">
+				UNION ALL
+				SELECT
+					#boardIds[]# AS BOARD_ID
+					, COUNT(*) AS TOTAL_COUNT
+					, SUM(HIT) AS TOTAL_VIEW 
+				FROM
+					$boardIds[]$
+			</iterate>
+		) A
+		LEFT JOIN JNITBOARDINFO B ON (A.BOARD_ID = B.BOARD_ID AND B.ISDEL = 0)
+		WHERE
+			1 = 1
+			AND A.BOARD_ID IS NOT NULL
+		<isNotEmpty prepend="AND" property="boardGroup">
+			B.BOARD_GROUP = #boardGroup#
+		</isNotEmpty>
+	</select>	
+</sqlMap>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="[first_package].mapper.[tail_package].[File_Name]">
+		
+	<sql id="[File_Name]Where">
+		WHERE
+			ISDEL = 'N'
+[MAPPER_IF_WHERE_SEARCH]
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"0".equals(searchCondition)'>	<!-- 전체 -->
+					AND [SecondColumn] LIKE '%'||#{searchKeyword}||'%'
+				</when>
+				<when test='"1".equals(searchCondition)'>	<!-- 제목 -->
+					AND [SecondColumn] LIKE '%'||#{searchKeyword}||'%'
+				</when>
+				<when test='"2".equals(searchCondition)'>	<!-- 내용 -->
+					
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="[File_Name]Column">
+[MAPPER_COLUMN]
+		CREATED_ID             createdId  ,
+		MODIFIED_ID            modifiedId ,
+		CREATED                created    ,
+		MODIFIED               modified   ,
+		ISDEL                  isdel
+	</sql>
+	<sql id="[File_Name]Table">
+	    [TABLE_NAME]
+	</sql>
+	<select id="selectList" parameterType="[PACKAGE].vo.[File_Name]VO" resultType="[PACKAGE].vo.[File_Name]VO">
+	
+		<if test="recordCountPerPage != 0">
+		SELECT  
+			*
+		FROM  (
+		</if>
+		
+			SELECT 
+				ROWNUM RNUM, ALL_LIST.*
+			FROM  (
+			
+				SELECT
+					<include refid="[File_Name]Column"/>
+				FROM
+					<include refid="[File_Name]Table"/>
+				<include refid="[File_Name]Where"/>
+				ORDER BY
+					[FirstColumn] DESC
+			)ALL_LIST
+			
+		<if test='recordCountPerPage != 0'>
+		) Z
+		WHERE  
+			RNUM  &gt; #{firstIndex}
+			AND  RNUM &lt;= #{firstIndex} + #{recordCountPerPage}
+		</if>
+		
+	</select>
+	<select id="selectTot" parameterType="[PACKAGE].vo.[File_Name]VO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="[File_Name]Table"/>
+		<include refid="[File_Name]Where"/>
+	</select>
+	
+	
+	<select id="select" parameterType="[PACKAGE].vo.[File_Name]VO" resultType="[PACKAGE].vo.[File_Name]VO">
+		SELECT
+			<include refid="[File_Name]Column"/>
+		FROM
+			<include refid="[File_Name]Table"/>
+		WHERE
+			[MAPPER_FIRST_COLUMN_SELECT]
+	</select>
+	
+	<insert id="insert" parameterType="[PACKAGE].vo.[File_Name]VO">
+		INSERT INTO [TABLE_NAME] (
+[MAPPER_INSERT_COLUMN]
+			CREATED_ID     ,
+			MODIFIED_ID       ,
+			CREATED        ,
+			MODIFIED        ,
+			ISDEL
+		) VALUES (
+[MAPPER_INSERT_ALIAS]
+			#{createdId}   ,
+			#{modifiedId}     ,
+			SYSDATE     ,
+			SYSDATE     ,
+			'N'
+		)
+	</insert>
+	
+	<update id="update" parameterType="[PACKAGE].vo.[File_Name]VO">
+		UPDATE 
+			[TABLE_NAME]
+		SET
+[MAPPER_UPDATE_COLUMN]
+			MODIFIED_ID       = #{modifiedId}    ,
+			MODIFIED          = SYSDATE
+		WHERE
+			[MAPPER_FIRST_COLUMN_SELECT]
+	</update>
+	
+	<update id="delete" parameterType="[PACKAGE].vo.[File_Name]VO">
+		UPDATE
+			[TABLE_NAME]
+		SET
+			ISDEL             = 'Y'              ,
+			MODIFIED_ID       = #{modifiedId}    ,
+			MODIFIED          = SYSDATE
+		WHERE
+			[MAPPER_FIRST_COLUMN_SELECT]
+	</update>	
+</mapper>

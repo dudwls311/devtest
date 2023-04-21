@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.com.ComGrpMenuAuthChng">
+	
+		
+	<sql id="ComGrpMenuAuthChngWhere">
+		WHERE
+			1 = 1
+		<if test='authGrpId != null and !authGrpId.equals("")'>
+			AND h.AUTH_GRP_ID = #{authGrpId}
+		</if>
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"1".equals(searchCondition)'>
+				AND m.MENU_NM LIKE '%'||#{searchKeyword}||'%'
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="ComGrpMenuAuthChngColumn">
+		h.CHNG_HIST_SN              chngHistSn   ,
+		h.AUTH_GRP_ID                authGrpId     ,
+		h.MENU_SN                   menuSn       ,
+		h.STRE_AUTH_YN               streAuthYn    ,
+		h.REDNG_AUTH_YN              redngAuthYn   ,
+		h.DEL_AUTH_YN                delAuthYn     ,
+		h.PRNTG_AUTH_YN              prntgAuthYn   ,
+		h.RGTR_ID                    rgtrId        ,
+		h.REG_DT                   regDt       ,
+		gm.GRP_NM                    grpNm         ,
+		mm.MBR_NM                    crtrNm        ,
+		SUBSTR(SYS_CONNECT_BY_PATH(m.MENU_NM, ' > '),3) menuNm
+	</sql>
+	<sql id="ComGrpMenuAuthChngTable">
+	    TB_GRP_MENU_AUTH_CHNG_H h
+	    LEFT JOIN TB_AUTH_GRP_M gm ON (gm.AUTH_GRP_ID = h.AUTH_GRP_ID)
+	    LEFT JOIN JNITCMSMBR mm ON (mm.MBR_ID = h.RGTR_ID)
+	    LEFT JOIN TB_MENU_M m ON (m.MENU_SN = h.MENU_SN)
+	</sql>
+	<select id="selectList" parameterType="exts.com.vo.ComGrpMenuAuthChngVO" resultType="exts.com.vo.ComGrpMenuAuthChngVO">
+		SELECT
+			<include refid="ComGrpMenuAuthChngColumn"/>
+		FROM
+			<include refid="ComGrpMenuAuthChngTable"/>
+		<include refid="ComGrpMenuAuthChngWhere"/>
+		START WITH m.UPR_MENU_SN = 0 
+		CONNECT BY PRIOR m.MENU_SN = m.UPR_MENU_SN
+		ORDER BY
+			h.CHNG_HIST_SN DESC
+		<if test="recordCountPerPage != 0">
+			LIMIT #{firstIndex},#{recordCountPerPage}
+		</if>
+	</select>
+	<select id="selectTot" parameterType="exts.com.vo.ComGrpMenuAuthChngVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="ComGrpMenuAuthChngTable"/>
+		<include refid="ComGrpMenuAuthChngWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.com.vo.ComGrpMenuAuthChngVO" resultType="exts.com.vo.ComGrpMenuAuthChngVO">
+		SELECT
+			<include refid="ComGrpMenuAuthChngColumn"/>
+		FROM
+			<include refid="ComGrpMenuAuthChngTable"/>
+		WHERE
+			h.AUTH_GRP_ID = #{authGrpId}
+		START WITH m.UPR_MENU_SN = 0 
+		CONNECT BY PRIOR m.MENU_SN = m.UPR_MENU_SN
+	</select>
+	
+	<insert id="insert" parameterType="exts.com.vo.ComGrpMenuAuthChngVO">
+		INSERT INTO TB_GRP_MENU_AUTH_CHNG_H (
+			AUTH_GRP_ID     ,
+			MENU_SN        ,
+			STRE_AUTH_YN    ,
+			REDNG_AUTH_YN   ,
+			DEL_AUTH_YN     ,
+			PRNTG_AUTH_YN   ,
+			RGTR_ID         ,
+			REG_DT        
+		) VALUES (
+			#{authGrpId}    ,
+			#{menuSn}      ,
+			#{streAuthYn}   ,
+			#{redngAuthYn}  ,
+			#{delAuthYn}    ,
+			#{prntgAuthYn}  ,
+			#{rgtrId}       ,
+			SYSDATETIME         
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.com.vo.ComGrpMenuAuthChngVO">
+		UPDATE 
+			TB_GRP_MENU_AUTH_CHNG_H
+		SET
+			MENU_SN        = #{menuSn}        ,
+			STRE_AUTH_YN    = #{streAuthYn}     ,
+			REDNG_AUTH_YN   = #{redngAuthYn}    ,
+			DEL_AUTH_YN     = #{delAuthYn}      ,
+			PRNTG_AUTH_YN   = #{prntgAuthYn}    
+		WHERE
+			AUTH_GRP_ID     = #{authGrpId}
+	</update>
+	
+	<delete id="delete" parameterType="exts.com.vo.ComGrpMenuAuthChngVO">
+		DELETE FROM
+			TB_GRP_MENU_AUTH_CHNG_H
+		WHERE
+			AUTH_GRP_ID     = #{authGrpId}
+	</delete>	
+	
+	<insert id="insertAll" parameterType="exts.com.vo.ComGrpMenuAuthChngVO">
+		INSERT INTO TB_GRP_MENU_AUTH_CHNG_H
+		SELECT
+			AUTH_GRP_ID     ,
+			MENU_SN        ,
+			SEQ_TB_GRP_MENU_AUTH_CHNG_H.NEXTVAL ,
+			STRE_AUTH_YN    ,
+			REDNG_AUTH_YN   ,
+			DEL_AUTH_YN     ,
+			PRNTG_AUTH_YN   ,
+			REG_DT        ,
+			RGTR_ID         
+		FROM
+			TB_GRP_MENU_AUTH_R
+		WHERE
+			AUTH_GRP_ID = #{authGrpId}
+	</insert>
+</mapper>

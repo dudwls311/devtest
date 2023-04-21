@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.cpf.emp.CpfBoardEmp">
+		
+	<sql id="CpfBoardEmpWhere">
+		WHERE
+			1 = 1
+		<!--
+		<if test='comNm != null and !comNm.equals("")'>
+			AND COM_NM = #{comNm}
+		</if>
+		<if test='writer != null and !writer.equals("")'>
+			AND WRITER = #{writer}
+		</if>
+		<if test='manager != null and !manager.equals("")'>
+			AND MANAGER = #{manager}
+		</if>
+		<if test='hit != null and !hit.equals("")'>
+			AND HIT = #{hit}
+		</if>
+		<if test='position != null and !position.equals("")'>
+			AND POSITION = #{position}
+		</if>
+		<if test='department != null and !department.equals("")'>
+			AND DEPARTMENT = #{department}
+		</if>
+
+		-->
+		
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"0".equals(searchCondition)'>	<!-- 전체 -->
+					AND (
+						COM_NM LIKE '%'||#{searchKeyword}||'%'
+					)
+				</when>
+				<when test='"1".equals(searchCondition)'>	<!-- 제목 -->
+					AND COM_NM LIKE '%'||#{searchKeyword}||'%'
+				</when>
+				<when test='"2".equals(searchCondition)'>	<!-- 내용 -->
+					
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="CpfBoardEmpColumn">
+		ID		id		,
+		COM_NM		comNm		,
+		WRITER		writer		,
+		MANAGER		manager		,
+		HIT		hit		,
+		[POSITION]		[position]		,
+		DEPT_ID		deptId	,
+		CONTENT        content 
+	</sql>
+	<sql id="CpfBoardEmpdept">
+		A.ID		id		,
+		A.COM_NM		comNm		,
+		A.WRITER		writer		,
+		A.MANAGER		manager		,
+		A.HIT		hit		,
+		A.[POSITION]		[position]		,
+		A.DEPT_ID		deptId	,
+		A.CONTENT        content , 
+	</sql>
+	<sql id="CpfBoardEmpTable">
+	    TEST_EMP
+	</sql>
+	<sql id="cpfBoardEmpDeptNm">
+	    INNER JOIN TB_DEPT B 
+	    ON A.DEPT_ID = B.DEPT_ID 
+	</sql>
+	<select id="selectList" parameterType="exts.cpf.emp.vo.CpfBoardEmpVO" resultType="exts.cpf.emp.vo.CpfBoardEmpVO">
+		SELECT
+			<include refid="CpfBoardEmpdept"/>
+			B.DEPT_NM deptNm
+		FROM
+			<include refid="CpfBoardEmpTable"/> A
+			<include refid="cpfBoardEmpDeptNm"/>
+		<include refid="CpfBoardEmpWhere"/>
+		ORDER BY
+			ID DESC
+		<if test="recordCountPerPage != 0">
+			LIMIT #{firstIndex},#{recordCountPerPage}
+		</if>
+	</select>
+	<select id="selectTot" parameterType="exts.cpf.emp.vo.CpfBoardEmpVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="CpfBoardEmpTable"/>
+		<include refid="CpfBoardEmpWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.cpf.emp.vo.CpfBoardEmpVO" resultType="exts.cpf.emp.vo.CpfBoardEmpVO">
+		SELECT
+			<include refid="CpfBoardEmpdept"/>
+			B.DEPT_NM deptNm
+		FROM
+			<include refid="CpfBoardEmpTable"/> A
+			<include refid="cpfBoardEmpDeptNm"/>
+		WHERE
+			ID = #{id}
+	</select>
+	
+	<insert id="insert" parameterType="exts.cpf.emp.vo.CpfBoardEmpVO">
+		<selectKey resultType="string" keyProperty="id" order="BEFORE">
+			SELECT SEQ_TEST_EMP.NEXTVAL
+		</selectKey>
+		INSERT INTO TEST_EMP (
+			ID		,
+			COM_NM		,
+			WRITER		,
+			MANAGER		,
+			HIT		,
+			[POSITION]		,
+			DEPT_ID      ,
+			CONTENT
+		) VALUES (
+			#{id}		,
+			#{comNm}		,
+			#{writer}		,
+			#{manager}		,
+			#{hit}		,
+			#{position}		,
+			#{deptId}	,
+			#{content}
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.cpf.emp.vo.CpfBoardEmpVO">
+		UPDATE 
+			TEST_EMP
+		SET
+			COM_NM	=	#{comNm}		,
+			WRITER	=	#{writer}		,
+			MANAGER	=	#{manager}		,
+			HIT	=	#{hit}		,
+			[POSITION]	=	#{position}		,
+			DEPT_ID	=	#{deptId}   ,
+			CONTENT    =    #{content}
+		WHERE
+			1 = 1
+			AND ID = #{id}
+	</update>
+	
+	<update id="delete" parameterType="exts.cpf.emp.vo.CpfBoardEmpVO">
+		DELETE FROM
+			TEST_EMP
+		WHERE
+			1 = 1
+			AND ID = #{id}
+	</update>	
+	<select id="selectId" parameterType="exts.cpf.emp.vo.CpfBoardEmpVO" resultType="exts.cpf.emp.vo.CpfBoardEmpVO">
+	    SELECT 
+	          MAX(ID) +1 AS ID
+	      FROM
+	          TEST_EMP
+	</select>
+</mapper>

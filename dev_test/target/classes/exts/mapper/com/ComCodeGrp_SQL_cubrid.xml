@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.com.ComCodeGrp">
+	
+		
+	<sql id="ComCodeGrpWhere">
+		WHERE
+			DEL_YN = 'N'
+		<if test='groupCdChgYn != null and !groupCdChgYn.equals("")'>
+			AND GROUP_CD_CHG_YN = #{groupCdChgYn}
+		</if>
+		<if test='groupCdSortSn != null and !groupCdSortSn.equals("")'>
+			AND GROUP_CD_SORT_SN = #{groupCdSortSn}
+		</if>
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"1".equals(searchCondition)'>
+				AND UP_GROUP_CD LIKE '%'||#{searchKeyword}||'%'
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="ComCodeGrpColumn">
+		GROUP_CD               groupCd       ,
+		UP_GROUP_CD            upGroupCd     ,
+		GROUP_CD_NM            groupCdNm     ,
+		GROUP_CD_LVL_VL        groupCdLvlVl  ,
+		GROUP_CD_SORT_SN       groupCdSortSn ,
+		GROUP_CD_CHG_YN        groupCdChgYn  ,
+		GROUP_CD_EXPLN         groupCdExpln  ,
+		RGTR_ID                rgtrId        ,
+		MDFR_ID                mdfrId        ,
+		REG_DT                 regDt         ,
+		MDFCN_DT               mdfcnDt       ,
+		DEL_YN                 delYn
+	</sql>
+	<sql id="ComCodeGrpTable">
+	    TB_CMMN_GROUP_CD
+	</sql>
+	<select id="selectList" parameterType="exts.com.vo.ComCodeGrpVO" resultType="exts.com.vo.ComCodeGrpVO">
+		SELECT
+			<include refid="ComCodeGrpColumn"/>
+		FROM
+			<include refid="ComCodeGrpTable"/>
+		<include refid="ComCodeGrpWhere"/>
+		ORDER BY
+			GROUP_CD ASC
+		<if test="recordCountPerPage != 0">
+			LIMIT #{firstIndex},#{recordCountPerPage}
+		</if>
+	</select>
+	<select id="selectTot" parameterType="exts.com.vo.ComCodeGrpVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="ComCodeGrpTable"/>
+		<include refid="ComCodeGrpWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.com.vo.ComCodeGrpVO" resultType="exts.com.vo.ComCodeGrpVO">
+		SELECT
+			<include refid="ComCodeGrpColumn"/>
+		FROM
+			<include refid="ComCodeGrpTable"/>
+		WHERE
+			GROUP_CD = #{groupCd}
+	</select>
+	
+	<insert id="insert" parameterType="exts.com.vo.ComCodeGrpVO">
+		INSERT INTO TB_CMMN_GROUP_CD (
+			GROUP_CD          ,
+			UP_GROUP_CD          ,
+			GROUP_CD_NM       ,
+			GROUP_CD_LVL_VL     ,
+			GROUP_CD_CHG_YN        ,
+			GROUP_CD_EXPLN         ,
+			RGTR_ID       ,
+			MDFR_ID      ,
+			REG_DT          ,
+			MDFCN_DT         ,
+			DEL_YN
+		) VALUES (
+			#{groupCd}        ,
+			#{upGroupCd}        ,
+			#{groupCdNm}     ,
+			#{groupCdLvlVl}    ,
+			#{groupCdChgYn}       ,
+			#{groupCdExpln}   ,
+			#{rgtrId}     ,
+			#{mdfrId}    ,
+			SYSDATETIME            ,
+			SYSDATETIME            ,
+			'N'
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.com.vo.ComCodeGrpVO">
+		UPDATE 
+			TB_CMMN_GROUP_CD
+		SET
+			UP_GROUP_CD        = #{upGroupCd}           ,
+			GROUP_CD_NM       =   #{groupCdNm}     ,
+			GROUP_CD_LVL_VL   = #{groupCdLvlVl}       ,
+			GROUP_CD_CHG_YN      = #{groupCdChgYn}          ,
+			GROUP_CD_EXPLN       =  #{groupCdExpln}     ,
+			MDFR_ID    = #{mdfrId}       ,
+			MDFCN_DT       = SYSDATETIME
+		WHERE
+			GROUP_CD = #{groupCd}
+	</update>
+	
+	<update id="delete" parameterType="exts.com.vo.ComCodeGrpVO">
+		UPDATE
+			TB_CMMN_GROUP_CD
+		SET
+			DEL_YN       = 'Y'              ,
+			MDFR_ID = #{mdfrId}    ,
+			MDFCN_DT    = SYSDATETIME
+		WHERE
+			GROUP_CD = #{groupCd}
+	</update>	
+</mapper>

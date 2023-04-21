@@ -1,0 +1,60 @@
+package exts.cpf.emp.validator;
+
+import org.springframework.stereotype.Component;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ValidationUtils;
+import org.springframework.validation.Validator;
+
+import exts.com.validator.ExtsAbstractValidator;
+import exts.cpf.emp.vo.CpfBoardEmpVO;
+
+/**
+ * @Class Name : CpfBoardEmpValidator.java
+ * @Description : 사내공고 게시판 Validator
+ * @Modification Information
+ * 
+ * @author
+ * @since 2023.02.23
+ * @version 1.0
+ * @see Copyright (C) by  All right reserved.
+ */
+@SuppressWarnings("unused")
+@Component("cpfBoardEmpValidator")
+public class CpfBoardEmpValidator extends ExtsAbstractValidator implements Validator {
+	//validate체크할  field들
+	private static final String id = "id";		//PK값
+	private static final String comNm = "comNm";		//회사명
+	private static final String writer = "writer";		//작성자
+	private static final String manager = "manager";		//관리자
+	private static final String hit = "hit";		//조회수
+	private static final String position = "position";		//직급
+	private static final String deptId = "deptId";		//부서
+	private static final String content = "content";		//내용
+	
+
+	private static final String FIELDNAME_PRFIX = "exts.item.cpf.emp";
+	@Override
+	protected String getTablePrefix() {return FIELDNAME_PRFIX;}
+	
+	@Override
+	public boolean supports(final Class<?> clazz) {
+
+		return CpfBoardEmpVO.class.equals(clazz);
+	}
+
+	@Override
+	public void validate(final Object obj, final Errors errors) {
+
+		final CpfBoardEmpVO command = (CpfBoardEmpVO) obj;
+		//ValidationUtils.rejectIfEmptyOrWhitespace(errors,id, REQUIRED_FIELD, makeMessage(id, REQUIRED_FIELD));	//PK값
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors,comNm, REQUIRED_FIELD, makeMessage(comNm, REQUIRED_FIELD));		//회사명
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors,writer, REQUIRED_FIELD, makeMessage(writer, REQUIRED_FIELD));		//작성자
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors,manager, REQUIRED_FIELD, makeMessage(manager, REQUIRED_FIELD));		//관리자
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors,hit, REQUIRED_FIELD, makeMessage(hit, REQUIRED_FIELD));		//조회수
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors,position, REQUIRED_FIELD, makeMessage(position, REQUIRED_FIELD));		//직급
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors,deptId, REQUIRED_FIELD, makeMessage(deptId, REQUIRED_FIELD));		//부서
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors,content, REQUIRED_FIELD, makeMessage(content, REQUIRED_FIELD));		//내용
+		
+	}
+
+}

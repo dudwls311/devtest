@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.cpf.position.CpfPosition">
+		
+	<sql id="CpfPositionWhere">
+		WHERE
+			DEL_YN = 'N'
+		<!--
+		<if test='positionNm != null and !positionNm.equals("")'>
+			AND POSITION_NM = #{positionNm}
+		</if>
+
+		-->
+		
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"0".equals(searchCondition)'>	<!-- 전체 -->
+					AND (
+						POSITION_NM LIKE '%'||#{searchKeyword}||'%'
+					)
+				</when>
+				<when test='"1".equals(searchCondition)'>	<!-- 제목 -->
+					AND POSITION_NM LIKE '%'||#{searchKeyword}||'%'
+				</when>
+				<when test='"2".equals(searchCondition)'>	<!-- 내용 -->
+					
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="CpfPositionColumn">
+		POSITION_ID		positionId		,
+		POSITION_NM		positionNm		,
+		DEL_YN				delYn 
+	</sql>
+	<sql id="CpfPositionTable">
+	    TB_POSITION
+	</sql>
+	<select id="selectList" parameterType="exts.cpf.position.vo.CpfPositionVO" resultType="exts.cpf.position.vo.CpfPositionVO">
+		SELECT
+			<include refid="CpfPositionColumn"/>
+		FROM
+			<include refid="CpfPositionTable"/>
+		<include refid="CpfPositionWhere"/>
+		ORDER BY
+			POSITION_ID DESC
+		
+	</select>
+	<select id="selectTot" parameterType="exts.cpf.position.vo.CpfPositionVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="CpfPositionTable"/>
+		<include refid="CpfPositionWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.cpf.position.vo.CpfPositionVO" resultType="exts.cpf.position.vo.CpfPositionVO">
+		SELECT
+			<include refid="CpfPositionColumn"/>
+		FROM
+			<include refid="CpfPositionTable"/>
+		WHERE
+			DEL_YN = 'N'
+			AND POSITION_ID = #{positionId}
+	</select>
+	
+	<insert id="insert" parameterType="exts.cpf.position.vo.CpfPositionVO">
+		<selectKey resultType="string" keyProperty="positionId" order="BEFORE">
+			SELECT SEQ_TB_POSITION.NEXTVAL
+		</selectKey>
+		INSERT INTO TB_POSITION (
+			POSITION_ID		,
+			POSITION_NM		,
+			DEL_YN
+		) VALUES (
+			#{positionId}		,
+			#{positionNm}		,
+			'N'
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.cpf.position.vo.CpfPositionVO">
+		UPDATE 
+			TB_POSITION
+		SET
+			POSITION_NM	=	#{positionNm}
+		WHERE
+			1 = 1
+			AND POSITION_ID = #{positionId}
+	</update>
+	
+	<update id="delete" parameterType="exts.cpf.position.vo.CpfPositionVO">
+		UPDATE
+			TB_POSITION
+		SET
+			DEL_YN			= 'Y'	
+		WHERE
+			1 = 1
+			AND POSITION_ID = #{positionId}
+	</update>	
+</mapper>

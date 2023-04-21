@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+        <!-- Appender, Layout 설정 -->
+        <Appenders>
+                <Console name="console" target="SYSTEM_OUT">
+                        <PatternLayout pattern="%d %5p [%c] %m%n"/>
+                </Console>
+                <!-- File name="file" fileName="./logs/log.log" append="false"> <PatternLayout
+                        pattern="%d %5p [%c] %m%n"/> </File -->
+        </Appenders>
+
+        <!-- Logger 설정 -->
+        <Loggers>
+        	<Root level="ERROR">
+				<AppenderRef ref="console" />
+			</Root>
+			
+			<!-- 큐브리드는 안먹힘 -->
+			<Logger name="jdbc.sqlonly" level="OFF" additivity="false"> 
+				<AppenderRef ref="console" /> 
+			</Logger>
+			<Logger name="jdbc.sqltiming" level="OFF" additivity="false">
+				<AppenderRef ref="console" />
+			</Logger>
+			<Logger name="jdbc.resultsettable" level="OFF" additivity="false"> 
+				<AppenderRef ref="console" />  
+			</Logger>
+			<Logger name="jdbc.audit" level="OFF" additivity="false">
+				<AppenderRef ref="console" />
+			</Logger>
+			<Logger name="jdbc.resultset" level="OFF" additivity="false">
+				<AppenderRef ref="console" />
+			</Logger>
+			<Logger name="jdbc.connection" level="OFF" additivity="false">
+				<AppenderRef ref="console" />
+			</Logger>
+			
+			<Logger name="exts" level="DEBUG" additivity="false">
+				<AppenderRef ref="console" />
+			</Logger>
+			<Logger name="exts.com.config" level="DEBUG" additivity="false"><!-- DEBUG시 mapper xml 자동리로드 -->
+				<AppenderRef ref="console" />
+			</Logger>
+			<Logger name="exts.mapper" level="DEBUG" additivity="false">
+				<AppenderRef ref="console" />
+			</Logger>
+			<Logger name="egovframework" level="ERROR" additivity="false">
+				<AppenderRef ref="console" />
+			</Logger>
+			<Logger name="jnit" level="DEBUG" additivity="false">
+				<AppenderRef ref="console" />
+			</Logger>
+			<Logger name="org.springframework" level="ERROR" additivity="false">
+				<AppenderRef ref="console" />
+			</Logger>
+        </Loggers>
+
+</Configuration>

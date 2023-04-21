@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.cpf.filemapping.CpfFileMapping">
+		
+	<sql id="CpfFileMappingWhere">
+		WHERE
+			DEL_YN = 'N'
+		<!--
+		<if test='fileId != null and !fileId.equals("")'>
+			AND FILE_ID = #{fileId}
+		</if>
+
+		-->
+		
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"0".equals(searchCondition)'>	<!-- 전체 -->
+					AND (
+						FILE_ID LIKE '%'||#{searchKeyword}||'%'
+					)
+				</when>
+				<when test='"1".equals(searchCondition)'>	<!-- 제목 -->
+					AND FILE_ID LIKE '%'||#{searchKeyword}||'%'
+				</when>
+				<when test='"2".equals(searchCondition)'>	<!-- 내용 -->
+					
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="CpfFileMappingColumn">
+		ID		id		,
+		FILE_ID		fileId		
+
+	
+	</sql>
+	<sql id="CpfFileMappingTable">
+	    TB_FILE_MAPPING
+	</sql>
+	<select id="selectList" parameterType="exts.cpf.filemapping.vo.CpfFileMappingVO" resultType="exts.cpf.filemapping.vo.CpfFileMappingVO">
+		SELECT
+			<include refid="CpfFileMappingColumn"/>
+		FROM
+			<include refid="CpfFileMappingTable"/>
+		<include refid="CpfFileMappingWhere"/>
+		ORDER BY
+			ID DESC
+		<if test="recordCountPerPage != 0">
+			LIMIT #{firstIndex},#{recordCountPerPage}
+		</if>
+	</select>
+	<select id="selectTot" parameterType="exts.cpf.filemapping.vo.CpfFileMappingVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="CpfFileMappingTable"/>
+		<include refid="CpfFileMappingWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.cpf.filemapping.vo.CpfFileMappingVO" resultType="exts.cpf.filemapping.vo.CpfFileMappingVO">
+		SELECT
+			<include refid="CpfFileMappingColumn"/>
+		FROM
+			<include refid="CpfFileMappingTable"/>
+		WHERE
+			  ID = #{id}
+		  AND FILE_ID = #{fileId}
+	</select>
+	
+	<insert id="insert" parameterType="exts.cpf.filemapping.vo.CpfFileMappingVO">
+		INSERT INTO TB_FILE_MAPPING (
+			ID		,
+			FILE_ID		
+		) VALUES (
+			#{id}		,
+			#{fileId}		
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.cpf.filemapping.vo.CpfFileMappingVO">
+		UPDATE 
+			TB_FILE_MAPPING
+		SET
+			FILE_ID	=	#{fileId}		
+		WHERE
+			1 = 1
+			AND ID = #{id}
+	</update>
+	
+	<update id="delete" parameterType="exts.cpf.filemapping.vo.CpfFileMappingVO">
+		UPDATE
+			TB_FILE_MAPPING
+		SET
+			DEL_YN			= 'Y'		,
+			MDFR_ID			= #{mdfrId}	,
+			MDFCN_DT		= SYSDATE
+		WHERE
+			1 = 1
+			AND ID = #{id}
+	</update>	
+</mapper>

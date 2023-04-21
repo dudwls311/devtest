@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.com.ComSmpl">
+	
+		
+	<sql id="ComSmplWhere">
+		WHERE
+			ISDEL = 'N'
+		<if test='smplNm != null and !smplNm.equals("")'>
+			AND SMPL_NM = #{smplNm}
+		</if>
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"0".equals(searchCondition)'>	<!-- 전체 -->
+					AND SMPL_NM LIKE CONCAT('%', #{searchKeyword}, '%')
+				</when>
+				<when test='"1".equals(searchCondition)'>	<!-- 제목 -->
+					AND SMPL_NM LIKE CONCAT('%', #{searchKeyword}, '%')
+				</when>
+				<when test='"2".equals(searchCondition)'>	<!-- 내용 -->
+					
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="ComSmplColumn">
+		SMPL_ID               smplId        ,
+		SMPL_NM               smplNm        ,
+		CREATED_ID            createdId     ,
+		MODIFIED_ID           modifiedId    ,
+		CREATED               created       ,
+		MODIFIED              modified      ,
+		ISDEL                 isdel
+	</sql>
+	<sql id="ComSmplTable">
+	    JNIT_COM_SMPL
+	</sql>
+	<select id="selectList" parameterType="exts.com.vo.ComSmplVO" resultType="exts.com.vo.ComSmplVO">
+	
+		<if test="recordCountPerPage != 0">
+		SELECT  
+			*
+		FROM  (
+		</if>
+			SELECT 
+				ROWNUM RNUM, ALL_LIST.*
+			FROM  (
+			
+				SELECT
+					<include refid="ComSmplColumn"/>
+				FROM
+					<include refid="ComSmplTable"/>
+				<include refid="ComSmplWhere"/>
+				ORDER BY
+					SMPL_ID DESC
+			)ALL_LIST
+		<if test='recordCountPerPage != 0'>
+		) Z
+		WHERE  
+			RNUM  &gt; #{firstIndex}
+			AND  RNUM &lt;= #{firstIndex} + #{recordCountPerPage}
+		</if>
+		
+	</select>
+	<select id="selectTot" parameterType="exts.com.vo.ComSmplVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="ComSmplTable"/>
+		<include refid="ComSmplWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.com.vo.ComSmplVO" resultType="exts.com.vo.ComSmplVO">
+		SELECT
+			<include refid="ComSmplColumn"/>
+		FROM
+			<include refid="ComSmplTable"/>
+		WHERE
+			SMPL_ID = #{smplId}
+	</select>
+	
+	<insert id="insert" parameterType="exts.com.vo.ComSmplVO">
+		INSERT INTO JNIT_COM_SMPL (
+			SMPL_ID        ,
+			SMPL_NM        ,
+			CREATED_ID     ,
+			MODIFIED_ID    ,
+			CREATED        ,
+			MODIFIED       ,
+			ISDEL
+		) VALUES (
+			#{smplId}      ,
+			#{smplNm}      ,
+			#{createdId}   ,
+			#{modifiedId}  ,
+			SYSDATE      ,
+			SYSDATE      ,
+			'N'
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.com.vo.ComSmplVO">
+		UPDATE 
+			JNIT_COM_SMPL
+		SET
+			SMPL_NM       = #{smplNm}         ,
+			MODIFIED_ID   = #{modifiedId}     ,
+			MODIFIED      = SYSDATE
+		WHERE
+			SMPL_ID       = #{smplId}
+	</update>
+	
+	<update id="delete" parameterType="exts.com.vo.ComSmplVO">
+		UPDATE
+			JNIT_COM_SMPL
+		SET
+			ISDEL         = 'Y'              ,
+			MODIFIED_ID   = #{modifiedId}    ,
+			MODIFIED      = SYSDATE
+		WHERE
+			SMPL_ID       = #{smplId}
+	</update>	
+</mapper>

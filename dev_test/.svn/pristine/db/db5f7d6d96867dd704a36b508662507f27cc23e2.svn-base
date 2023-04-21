@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.com.ComSmpl">
+	
+		
+	<sql id="ComSmplWhere">
+		WHERE
+			DEL_YN = 'N'
+		<if test='smplNm != null and !smplNm.equals("")'>
+			AND SMPL_NM = #{smplNm}
+		</if>
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"0".equals(searchCondition)'>	<!-- 전체 -->
+					AND SMPL_NM LIKE CONCAT('%', #{searchKeyword}, '%')
+				</when>
+				<when test='"1".equals(searchCondition)'>	<!-- 제목 -->
+					AND SMPL_NM LIKE CONCAT('%', #{searchKeyword}, '%')
+				</when>
+				<when test='"2".equals(searchCondition)'>	<!-- 내용 -->
+					
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="ComSmplColumn">
+		SMPL_ID               smplId        ,
+		SMPL_NM               smplNm        ,
+		RGTR_ID            rgtrId     ,
+		MDFR_ID           mdfrId    ,
+		REG_DT               regDt       ,
+		MDFCN_DT              mdfcnDt      ,
+		DEL_YN                 DEL_YN
+	</sql>
+	<sql id="ComSmplTable">
+	    TB_COM_SMPL
+	</sql>
+	<select id="selectList" parameterType="exts.com.vo.ComSmplVO" resultType="exts.com.vo.ComSmplVO">
+		SELECT
+			<include refid="ComSmplColumn"/>
+		FROM
+			<include refid="ComSmplTable"/>
+		<include refid="ComSmplWhere"/>
+		ORDER BY
+			SMPL_ID DESC
+		<if test="recordCountPerPage != 0">
+			LIMIT #{firstIndex},#{recordCountPerPage}
+		</if>
+	</select>
+	<select id="selectTot" parameterType="exts.com.vo.ComSmplVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="ComSmplTable"/>
+		<include refid="ComSmplWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.com.vo.ComSmplVO" resultType="exts.com.vo.ComSmplVO">
+		SELECT
+			<include refid="ComSmplColumn"/>
+		FROM
+			<include refid="ComSmplTable"/>
+		WHERE
+			SMPL_ID = #{smplId}
+	</select>
+	
+	<insert id="insert" parameterType="exts.com.vo.ComSmplVO">
+		INSERT INTO TB_COM_SMPL (
+			SMPL_ID        ,
+			SMPL_NM        ,
+			RGTR_ID     ,
+			MDFR_ID    ,
+			REG_DT        ,
+			MDFCN_DT       ,
+			DEL_YN
+		) VALUES (
+			#{smplId}      ,
+			#{smplNm}      ,
+			#{rgtrId}   ,
+			#{mdfrId}  ,
+			SYSDATETIME      ,
+			SYSDATETIME      ,
+			'N'
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.com.vo.ComSmplVO">
+		UPDATE 
+			TB_COM_SMPL
+		SET
+			SMPL_NM       = #{smplNm}         ,
+			MDFR_ID   = #{mdfrId}     ,
+			MDFCN_DT      = SYSDATETIME
+		WHERE
+			SMPL_ID       = #{smplId}
+	</update>
+	
+	<update id="delete" parameterType="exts.com.vo.ComSmplVO">
+		UPDATE
+			TB_COM_SMPL
+		SET
+			DEL_YN         = 'Y'              ,
+			MDFR_ID   = #{mdfrId}    ,
+			MDFCN_DT      = SYSDATETIME
+		WHERE
+			SMPL_ID       = #{smplId}
+	</update>	
+</mapper>

@@ -1,0 +1,28 @@
+package exts.cpf.filemapping.vo;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+import exts.com.vo.ExtsAbstractVO;
+/**
+ * @Class Name : CpfFileMappingVO.java
+ * @Description : 첨부파일매핑 VO
+ * @Modification Information
+ * 
+ * @author
+ * @since 2023.02.24
+ * @version 1.0
+ * @see Copyright (C) by  All right reserved.
+ */
+@Getter
+@Setter
+public class CpfFileMappingVO extends ExtsAbstractVO {
+
+	private String id;		//고유ID
+	private String fileId;		//파일고유아이디
+	
+
+	private String cfmMode;		//화면 모드
+}

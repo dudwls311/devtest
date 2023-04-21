@@ -1,0 +1,31 @@
+package exts.cpf.emp.vo;
+
+import lombok.Getter;
+import lombok.Setter;
+import exts.com.vo.ExtsAbstractVO;
+/**
+ * @Class Name : CpfBoardEmpVO.java
+ * @Description : 사내공고 게시판 VO
+ * @Modification Information
+ * 
+ * @author
+ * @since 2023.02.23
+ * @version 1.0
+ * @see Copyright (C) by  All right reserved.
+ */
+@Getter
+@Setter
+public class CpfBoardEmpVO extends ExtsAbstractVO {
+
+	private String id;		//PK값
+	private String comNm;		//회사명
+	private String writer;		//작성자
+	private String manager;		//관리자
+	private String hit;		//조회수
+	private String position;		//직급
+	private String department;		//부서
+	private String content;         //내용 
+	
+
+	private String cbeMode;		//화면 모드
+}

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+@version 3.2.0.1
+-->
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="JnitboardinfoHistory">
+	
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="jnitcmsboardinfoSerarchVO" type="jnit.board.info.JnitboardinfoDefaultVO"/>
+	
+	<resultMap id="JnitboardinfoHistory" class="jnit.board.info.history.JnitboardinfoHistoryVO">
+		<result property="boardId" column="BOARD_ID" columnIndex="1"/>
+		<result property="boardGroup" column="BOARD_GROUP" columnIndex="2"/>
+		<result property="boardTitle" column="BOARD_TITLE" columnIndex="3"/>
+		<result property="mbrId" column="MBR_ID" columnIndex="4"/>
+		<result property="action" column="ACTION" columnIndex="5"/>
+		<result property="actionDate" column="ACTION_DATE" columnIndex="6"/>
+		<result property="actionIp" column="ACTION_IP" columnIndex="7"/>
+		<result property="mbrLogin" column="MBR_LOGIN" columnIndex="8"/>
+		<result property="siteNm" column="SITE_NM" columnIndex="9"/>
+	</resultMap>
+	
+	<insert id="jnitboardinfoHistoryDAO.insertJnitboardinfoHistory_S">
+		<![CDATA[
+			INSERT INTO JNITBOARDINFO_HISTORY 
+				(
+				 BOARD_ID
+				 , BOARD_GROUP
+				 , BOARD_TITLE
+				 , MBR_ID
+				 , [ACTION]
+				 , ACTION_DATE
+				 , ACTION_IP
+				) VALUES (
+				  #boardId#
+				  , #boardGroup#
+				  , #boardTitle#
+				  , #mbrId#
+				  , #action#
+				  , SYSDATETIME
+				  , #actionIp#
+				)
+		]]>
+	</insert>
+	
+	<select id="jnitboardinfoHistoryDAO.selectJnitboardinfoHistoryList_D" parameterClass="jnitcmsboardinfoSerarchVO" resultClass="egovMap">
+		SELECT
+				A.BOARD_ID
+				, A.BOARD_GROUP
+				, A.BOARD_TITLE
+				, A.MBR_ID
+				, A.[ACTION]
+				, A.ACTION_DATE
+				, A.ACTION_IP
+				, B.MBR_LOGIN
+                , C.SITE_NM
+		FROM
+			JNITBOARDINFO_HISTORY A
+            LEFT JOIN JNITCMSMBR B ON (A.MBR_ID = B.MBR_ID AND B.ISDEL = 0)
+            LEFT JOIN JNITCMSSITE C ON (A.BOARD_GROUP = C.SITE_ID AND C.ISDEL = 0)
+		WHERE
+			1=1
+		<isNotEmpty prepend="AND" property="boardGroup">
+		    BOARD_GROUP = #boardGroup#
+		</isNotEmpty>
+		ORDER BY
+			ACTION_DATE DESC
+		LIMIT
+			#firstIndex#, #recordCountPerPage#	
+	</select>	
+	<select id="jnitboardinfoHistoryDAO.selectJnitboardinfoHistoryListTotCnt_S" parameterClass="jnitcmsboardinfoSerarchVO" resultClass="int">
+		SELECT
+			COUNT(*) totcnt
+		FROM
+			JNITBOARDINFO_HISTORY
+		WHERE
+			1=1
+		<isNotEmpty prepend="AND" property="boardGroup">
+		    BOARD_GROUP = #boardGroup#
+		</isNotEmpty>
+	</select>
+</sqlMap>

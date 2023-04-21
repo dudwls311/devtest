@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="exts.mapper.com.ComIndvlzMenuAuth">
+	
+		
+	<sql id="ComIndvlzMenuAuthWhere">
+		WHERE
+			1 = 1
+		<if test='mbrId != null and !mbrId.equals("")'>
+			AND MBR_ID = #{mbrId}
+		</if>
+		<if test='searchKeyword != null and !searchKeyword.equals("")'>
+			<choose>
+				<when test='"1".equals(searchCondition)'>
+				AND MBR_ID LIKE '%'||#{searchKeyword}||'%'
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="ComIndvlzMenuAuthColumn">
+		MBR_ID                     mbrId         ,
+		MENU_SN                   menuSn       ,
+		STRE_AUTH_YN               streAuthYn    ,
+		REDNG_AUTH_YN              redngAuthYn   ,
+		DEL_AUTH_YN                delAuthYn     ,
+		PRNTG_AUTH_YN              prntgAuthYn   ,
+		RGTR_ID                    rgtrId        ,
+		REG_DT                   regDt       
+	</sql>
+	<sql id="ComIndvlzMenuAuthTable">
+	    TB_INDVLZ_MENU_AUTH_R
+	</sql>
+	<select id="selectList" parameterType="exts.com.vo.ComIndvlzMenuAuthVO" resultType="exts.com.vo.ComIndvlzMenuAuthVO">
+		SELECT
+			<include refid="ComIndvlzMenuAuthColumn"/>
+		FROM
+			<include refid="ComIndvlzMenuAuthTable"/>
+		<include refid="ComIndvlzMenuAuthWhere"/>
+		ORDER BY
+			MBR_ID DESC
+		<if test="recordCountPerPage != 0">
+			LIMIT #{firstIndex},#{recordCountPerPage}
+		</if>
+	</select>
+	<select id="selectTot" parameterType="exts.com.vo.ComIndvlzMenuAuthVO" resultType="Integer">
+		SELECT
+			COUNT(*) AS TOTAL
+		FROM
+			<include refid="ComIndvlzMenuAuthTable"/>
+		<include refid="ComIndvlzMenuAuthWhere"/>
+	</select>
+	
+	
+	<select id="select" parameterType="exts.com.vo.ComIndvlzMenuAuthVO" resultType="exts.com.vo.ComIndvlzMenuAuthVO">
+		SELECT
+			<include refid="ComIndvlzMenuAuthColumn"/>
+		FROM
+			<include refid="ComIndvlzMenuAuthTable"/>
+		WHERE
+			MBR_ID = #mbrId#
+	</select>
+	
+	<insert id="insert" parameterType="exts.com.vo.ComIndvlzMenuAuthVO">
+		INSERT INTO TB_INDVLZ_MENU_AUTH_R (
+			MBR_ID          ,
+			AUTH_GRP_ID          ,
+			MENU_SN        ,
+			STRE_AUTH_YN    ,
+			REDNG_AUTH_YN   ,
+			DEL_AUTH_YN     ,
+			PRNTG_AUTH_YN   ,
+			RGTR_ID         ,
+			REG_DT
+		) VALUES (
+			#{mbrId}        ,
+			#{authGrpId}        ,
+			#{menuSn}      ,
+			#{streAuthYn}   ,
+			#{redngAuthYn}  ,
+			#{delAuthYn}    ,
+			#{prntgAuthYn}  ,
+			#{rgtrId}       ,
+			SYSDATETIME 
+		)
+	</insert>
+	
+	<update id="update" parameterType="exts.com.vo.ComIndvlzMenuAuthVO">
+		UPDATE 
+			TB_INDVLZ_MENU_AUTH_R
+		SET
+			MENU_SN        = #{menuSn}        ,
+			STRE_AUTH_YN    = #{streAuthYn}     ,
+			REDNG_AUTH_YN   = #{redngAuthYn}    ,
+			DEL_AUTH_YN     = #{delAuthYn}      ,
+			PRNTG_AUTH_YN   = #{prntgAuthYn}    
+		WHERE
+			MBR_ID     = #{mbrId}
+	</update>
+	
+	<delete id="delete" parameterType="exts.com.vo.ComIndvlzMenuAuthVO">
+		DELETE FROM
+			TB_INDVLZ_MENU_AUTH_R
+		WHERE
+			MBR_ID     = #{mbrId}
+	</delete>	
+</mapper>

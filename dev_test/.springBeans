@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beansProjectDescription>
+	<version>1</version>
+	<pluginVersion><![CDATA[3.7.0.201506251244-RELEASE]]></pluginVersion>
+	<configSuffixes>
+		<configSuffix><![CDATA[xml]]></configSuffix>
+	</configSuffixes>
+	<enableImports><![CDATA[false]]></enableImports>
+	<configs>
+	</configs>
+	<autoconfigs>
+		<config>src/main/resources/jnit/spring/context-scrap-idgen.xml</config>
+		<config>src/main/resources/jnit/spring/context-sms-idgen.xml</config>
+		<config>src/main/resources/jnit/spring/context-cms-idgen.xml</config>
+		<config>src/main/resources/egovframework/spring/com/context-aspect.xml</config>
+		<config>src/main/resources/egovframework/spring/com/context-mail.xml</config>
+		<config>src/main/webapp/WEB-INF/config/egovframework/springmvc/egov-com-servlet.xml</config>
+		<config>src/main/resources/jnit/spring/context-board-idgen.xml</config>
+		<config>src/main/resources/jnit/spring/context-ebook-idgen.xml</config>
+		<config>src/main/resources/egovframework/spring/com/context-properties.xml</config>
+		<config>src/main/resources/egovframework/spring/com/context-sqlMap.xml</config>
+		<config>src/main/resources/egovframework/spring/com/context-excel.xml</config>
+		<config>src/main/resources/egovframework/spring/com/context-transaction.xml</config>
+		<config>src/main/resources/egovframework/spring/com/context-validator.xml</config>
+		<config>src/main/resources/jnit/spring/context-research-idgen.xml</config>
+		<config>src/main/resources/jnit/spring/context-loginlog-idgen.xml</config>
+		<config>src/main/resources/jnit/spring/context-cron.xml</config>
+		<config>src/main/resources/jnit/spring/context-rsc-idgen.xml</config>
+		<config>src/main/resources/jnit/spring/context-allim-idgen.xml</config>
+		<config>src/main/resources/egovframework/spring/com/context-common.xml</config>
+		<config>src/main/resources/egovframework/spring/com/context-egovuserdetailshelper.xml</config>
+		<config>src/main/resources/egovframework/spring/com/context-idgen.xml</config>
+		<config>src/main/resources/egovframework/spring/com/context-datasource.xml</config>
+	</autoconfigs>
+	<configSets>
+	</configSets>
+</beansProjectDescription>
